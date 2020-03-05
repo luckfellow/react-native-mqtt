@@ -39,7 +39,7 @@ RCT_EXPORT_MODULE();
         _clients = [[NSMutableDictionary alloc] init];
     }
     return self;
-    
+
 }
 
 
@@ -68,14 +68,14 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(createClient:(NSDictionary *) options
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject) {
-    
+
     NSString *clientRef = [[NSProcessInfo processInfo] globallyUniqueString];
-    
+
     Mqtt *client = [[Mqtt allocWithZone: nil] initWithEmitter:self options:options clientRef:clientRef];
-    
+
     [[self clients] setObject:client forKey:clientRef];
     resolve(clientRef);
-    
+
 }
 
 RCT_EXPORT_METHOD(removeClient:(nonnull NSString *) clientRef) {
@@ -107,12 +107,32 @@ RCT_EXPORT_METHOD(unsubscribe:(nonnull NSString *) clientRef topic:(NSString *)t
     [[[self clients] objectForKey:clientRef] unsubscribe:topic];
 }
 
-RCT_EXPORT_METHOD(publish:(nonnull NSString *) clientRef topic:(NSString *)topic data:(NSString*)data qos:(nonnull NSNumber *)qos retain:(BOOL)retain) {
-    [[[self clients] objectForKey:clientRef] publish:topic
+RCT_EXPORT_METHOD(publish:(nonnull NSString *) clientRef topic:(NSString *)topic data:(NSString*)data qos:(nonnull NSNumber *)qos retain:(BOOL)retain resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    UInt16 msgID = [[[self clients] objectForKey:clientRef] publish:topic
                                                 data:[data dataUsingEncoding:NSUTF8StringEncoding]
                                                  qos:qos
                                               retain:retain];
-    
+    NSNumber *retVal = @(msgID);
+    resolve(retVal);
+}
+
+RCT_EXPORT_METHOD(publishUInt8:(nonnull NSString *) clientRef topic:(NSString *)topic data:(NSArray*)data qos:(nonnull NSNumber *)qos retain:(BOOL)retain resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+    unsigned c = data.count;
+    uint8_t *bytes = malloc(sizeof(*bytes) * c);
+    unsigned i;
+    for(i = 0; i < c; i++)
+    {
+        NSString *str = [data objectAtIndex:i];
+        int byte = [str intValue];
+        bytes[i] = byte;
+    }
+    NSData * data2 = [NSData dataWithBytesNoCopy:bytes length:c freeWhenDone:YES];
+    UInt16 msgID = [[[self clients] objectForKey:clientRef] publish:topic
+                                                data:data2
+                                                 qos:qos
+                                              retain:retain];
+    NSNumber *retVal = @(msgID);
+    resolve(retVal);
 }
 
 - (void)invalidate

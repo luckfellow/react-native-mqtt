@@ -43,11 +43,11 @@
                                 @"willQos": @0,
                                 @"willRetainFlag": @NO
                                 };
-        
+
     }
-    
-    
-    
+
+
+
     return self;
 }
 
@@ -62,27 +62,27 @@
         [self.options setValue:options[key] forKey:key];
     }
 
-   
-    
-    
+
+
+
     return self;
 }
 
 - (void) connect {
-    
+
     MQTTSSLSecurityPolicy *securityPolicy = nil;
     if(self.options[@"tls"]) {
         securityPolicy = [MQTTSSLSecurityPolicy policyWithPinningMode:MQTTSSLPinningModeNone];
         securityPolicy.allowInvalidCertificates = YES;
     }
-    
+
     NSData *willMsg = nil;
     if(self.options[@"willMsg"] != [NSNull null]) {
         willMsg = [self.options[@"willMsg"] dataUsingEncoding:NSUTF8StringEncoding];
     }
     if (!self.manager) {
         dispatch_queue_t queue = dispatch_queue_create("com.hawking.app.anchor.mqtt", NULL);
-        
+
         self.manager = [[MQTTSessionManager alloc] initWithPersistence:NO maxWindowSize:MQTT_MAX_WINDOW_SIZE maxMessages:MQTT_MAX_MESSAGES maxSize:MQTT_MAX_SIZE maxConnectionRetryInterval:60.0 connectInForeground:NO streamSSLLevel:nil queue: queue];
         self.manager.delegate = self;
         MQTTCFSocketTransport *transport = [[MQTTCFSocketTransport alloc] init];
@@ -114,12 +114,12 @@
         [self.manager connectToLast:^(NSError *error) {
         }];
     }
-   
+
 }
 
 - (void)sessionManager:(MQTTSessionManager *)sessonManager didChangeState:(MQTTSessionManagerState)newState {
     switch (newState) {
-            
+
         case MQTTSessionManagerStateClosed:
             [self.emitter sendEventWithName:@"mqtt_events"
                                        body:@{@"event": @"closed",
@@ -179,7 +179,7 @@
     [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
     [self.manager disconnectWithDisconnectHandler:^(NSError *error) {
     }];
-    
+
 }
 
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos {
@@ -194,23 +194,35 @@
     [self.manager setSubscriptions:subscriptions];
 }
 
-- (void) publish:(NSString *) topic data:(NSData *)data qos:(NSNumber *)qos retain:(BOOL) retain {
-    [self.manager sendData:data topic:topic qos:[qos intValue] retain:retain];
+- (UInt16) publish:(NSString *) topic data:(NSData *)data qos:(NSNumber *)qos retain:(BOOL) retain {
+    UInt16 msgID = [self.manager sendData:data topic:topic qos:[qos intValue] retain:retain];
+    return msgID;
 }
 
 - (void)handleMessage:(NSData *)data onTopic:(NSString *)topic retained:(BOOL)retained {
     NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSUInteger len = data.length;
+    uint8_t *bytes = (uint8_t *)[data bytes];
+    NSMutableString *result = [NSMutableString stringWithCapacity:len * 3];
+    [result appendString:@"["];
+    for (NSUInteger i = 0; i < len; i++) {
+        if (i) {
+            [result appendString:@","];
+        }
+        [result appendFormat:@"%d", bytes[i]];
+    }
+    [result appendString:@"]"];
     [self.emitter sendEventWithName:@"mqtt_events"
                                body:@{
                                       @"event": @"message",
                                       @"clientRef": self.clientRef,
                                       @"message": @{
                                               @"topic": topic,
-                                              @"data": dataString,
+                                              @"data": result,
+                                              @"dataString": dataString,
                                               @"retain": [NSNumber numberWithBool:retained]
                                               }
                                       }];
-    
 }
 
 

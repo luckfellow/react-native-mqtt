@@ -1,6 +1,6 @@
 {
-  "name": "sp-react-native-mqtt",
-  "version": "0.4.25",
+  "name": "react-native-mqtt",
+  "version": "0.5.0",
   "description": "MQTT client for react-native",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SudoPlz/react-native-mqtt.git"
+    "url": "git+https://github.com/luckfellow/react-native-mqtt.git"
   },
   "keywords": [
     "mqtt",
@@ -41,10 +41,10 @@
       "email": "tao_qiufeng@126.com",
       "url": "http://github.com/taoqf"
     }
-  ],  
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SudoPlz/react-native-mqtt/issues"
+    "url": "https://github.com/luckfellow/react-native-mqtt/issues"
   },
-  "homepage": "https://github.com/SudoPlz/react-native-mqtt#readme"
+  "homepage": "https://github.com/luckfellow/react-native-mqtt#readme"
 }

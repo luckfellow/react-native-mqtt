@@ -350,17 +350,40 @@ public class RCTMqtt implements MqttCallbackExtended {
      * @param qos
      * @param retain
      */
-    public void publish(@NonNull final String topic, @NonNull final String payload, final int qos,
+    public int publish(@NonNull final String topic, @NonNull final String payload, final int qos,
             final boolean retain) {
         try {
             byte[] encodedPayload = payload.getBytes("UTF-8");
             MqttMessage message = new MqttMessage(encodedPayload);
             message.setQos(qos);
             message.setRetained(retain);
-            client.publish(topic, message);
+            IMqttDeliveryToken mqttDeliveryToken = client.publish(topic, message);
+            return mqttDeliveryToken.getMessageId();
         } catch (UnsupportedEncodingException | MqttException e) {
             e.printStackTrace();
         }
+        return 0;
+    }
+
+    /**
+     * @param topic
+     * @param payload
+     * @param qos
+     * @param retain
+     */
+    public int publishUInt8(@NonNull final String topic, @NonNull final byte[] payload, final int qos,
+            final boolean retain) {
+        try {
+            byte[] encodedPayload = payload;
+            MqttMessage message = new MqttMessage(encodedPayload);
+            message.setQos(qos);
+            message.setRetained(retain);
+            IMqttDeliveryToken mqttDeliveryToken = client.publish(topic, message);
+            return mqttDeliveryToken.getMessageId();
+        } catch (UnsupportedEncodingException | MqttException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     /****************************************************************/
@@ -413,7 +436,8 @@ public class RCTMqtt implements MqttCallbackExtended {
         log("Delivery complete callback: Publish Completed ");
         WritableMap params = Arguments.createMap();
         params.putString("event", "msgSent");
-        params.putString("message", "OK");
+        //params.putString("message", "OK");
+        params.putString("message", token.getMessageId());
         sendEvent(reactContext, "mqtt_events", params);
     }
 
@@ -429,7 +453,8 @@ public class RCTMqtt implements MqttCallbackExtended {
 
         WritableMap data = Arguments.createMap();
         data.putString("topic", topic);
-        data.putString("data", new String(message.getPayload()));
+        data.putString("data", message.getPayload());
+        data.putString("dataString", new String(message.getPayload()));
         data.putInt("qos", message.getQos());
         data.putBoolean("retain", message.isRetained());
 

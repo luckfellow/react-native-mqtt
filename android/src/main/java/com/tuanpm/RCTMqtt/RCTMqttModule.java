@@ -86,13 +86,23 @@ public class RCTMqttModule extends ReactContextBaseJavaModule
     }
 
     @ReactMethod
-    public void publish(@NonNull final String clientRef,
+    public int publish(@NonNull final String clientRef,
                         @NonNull final String topic,
                         @NonNull final String payload,
                         final int qos,
                         final boolean retain)
     {
-        clients.get(clientRef).publish(topic, payload, qos, retain);
+        return clients.get(clientRef).publish(topic, payload, qos, retain);
+    }
+
+    @ReactMethod
+    public int publishUInt8(@NonNull final String clientRef,
+                        @NonNull final String topic,
+                        @NonNull final byte[] payload,
+                        final int qos,
+                        final boolean retain)
+    {
+        return clients.get(clientRef).publishUInt8(topic, payload, qos, retain);
     }
 
     @ReactMethod
@@ -110,13 +120,13 @@ public class RCTMqttModule extends ReactContextBaseJavaModule
     {
         clients.get(clientRef).reconnect();
     }
-    
+
     @ReactMethod
     public void isConnected(@NonNull final String clientRef, Promise promise)
     {
         promise.resolve(clients.get(clientRef).isConnected());
     }
-    
+
     private String createClientRef()
     {
         return UUID.randomUUID().toString();
