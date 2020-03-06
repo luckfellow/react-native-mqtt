@@ -4,7 +4,7 @@ json = File.read(File.join(__dir__, "package.json"))
 package = JSON.parse(json).deep_symbolize_keys
 
 Pod::Spec.new do |s|
-  s.name = package[:name]
+  s.name = "react-native-mqtt"
   s.version = package[:version]
   s.license = { type: "MIT" }
   s.homepage = "https://github.com/luckfellow/react-native-mqtt"
