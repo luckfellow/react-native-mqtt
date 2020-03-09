@@ -200,7 +200,7 @@
 }
 
 - (void)handleMessage:(NSData *)data onTopic:(NSString *)topic retained:(BOOL)retained {
-    NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    //NSString *dataString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];    //TODO nil
     NSUInteger len = data.length;
     uint8_t *bytes = (uint8_t *)[data bytes];
     NSMutableString *result = [NSMutableString stringWithCapacity:len * 3];
@@ -219,7 +219,7 @@
                                       @"message": @{
                                               @"topic": topic,
                                               @"data": result,
-                                              @"dataString": dataString,
+                                              //@"dataString": dataString,
                                               @"retain": [NSNumber numberWithBool:retained]
                                               }
                                       }];
