@@ -98,10 +98,17 @@ public class RCTMqttModule extends ReactContextBaseJavaModule
     @ReactMethod
     public int publishUInt8(@NonNull final String clientRef,
                         @NonNull final String topic,
-                        @NonNull final byte[] payload,
+                        @NonNull final ReadableArray payload,
                         final int qos,
                         final boolean retain)
     {
+        byte[] bytesArr = new byte[payload.size()];
+        for (int i = 0; i < payload.size(); i++) {
+            String str = payload.getString(i);
+            int in = payload.getInt(i);
+            //bytesArr[i] = in & 0xFF;
+            bytesArr[i] = (byte)in;
+        }
         return clients.get(clientRef).publishUInt8(topic, payload, qos, retain);
     }
 

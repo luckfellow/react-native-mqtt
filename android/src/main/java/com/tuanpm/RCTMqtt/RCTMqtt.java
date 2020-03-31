@@ -380,7 +380,7 @@ public class RCTMqtt implements MqttCallbackExtended {
             message.setRetained(retain);
             IMqttDeliveryToken mqttDeliveryToken = client.publish(topic, message);
             return mqttDeliveryToken.getMessageId();
-        } catch (UnsupportedEncodingException | MqttException e) {
+        } catch (MqttException e) {
             e.printStackTrace();
         }
         return 0;
@@ -451,9 +451,19 @@ public class RCTMqtt implements MqttCallbackExtended {
         log(new StringBuilder("  Topic:\t").append(topic).append("  Message:\t")
                 .append(new String(message.getPayload())).append("  QoS:\t").append(message.getQos()).toString());
 
+        byte[] bytes = message.getPayload();
+        String result = "[";
+        for(int i = 0; i < bytes.length; i++) {
+            if(i > 0){
+                result += ",";
+            }
+            result += (bytes[i] & 0xFF);
+        }
+        result += "]";
+
         WritableMap data = Arguments.createMap();
         data.putString("topic", topic);
-        data.putString("data", message.getPayload());
+        data.putString("data", result);
         data.putString("dataString", new String(message.getPayload()));
         data.putInt("qos", message.getQos());
         data.putBoolean("retain", message.isRetained());
