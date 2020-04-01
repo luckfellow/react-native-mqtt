@@ -11,6 +11,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
 
 import java.util.HashMap;
@@ -104,12 +105,12 @@ public class RCTMqttModule extends ReactContextBaseJavaModule
     {
         byte[] bytesArr = new byte[payload.size()];
         for (int i = 0; i < payload.size(); i++) {
-            String str = payload.getString(i);
+            //String str = payload.getString(i);
             int in = payload.getInt(i);
             //bytesArr[i] = in & 0xFF;
             bytesArr[i] = (byte)in;
         }
-        return clients.get(clientRef).publishUInt8(topic, payload, qos, retain);
+        return clients.get(clientRef).publishUInt8(topic, bytesArr, qos, retain);
     }
 
     @ReactMethod

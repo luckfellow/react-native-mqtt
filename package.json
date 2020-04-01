@@ -1,6 +1,6 @@
 {
   "name": "@luckfellow/react-native-mqtt",
-  "version": "0.5.3",
+  "version": "0.5.5",
   "description": "MQTT client for react-native",
   "main": "index.js",
   "scripts": {

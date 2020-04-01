@@ -437,7 +437,7 @@ public class RCTMqtt implements MqttCallbackExtended {
         WritableMap params = Arguments.createMap();
         params.putString("event", "msgSent");
         //params.putString("message", "OK");
-        params.putString("message", token.getMessageId());
+        params.putInt("message", token.getMessageId());
         sendEvent(reactContext, "mqtt_events", params);
     }
 
