@@ -96,7 +96,7 @@ public class RCTMqttModule extends ReactContextBaseJavaModule
         return clients.get(clientRef).publish(topic, payload, qos, retain);
     }
 
-    @ReactMethod
+    @ReactMethod(isBlockingSynchronousMethod = true)
     public int publishUInt8(@NonNull final String clientRef,
                         @NonNull final String topic,
                         @NonNull final ReadableArray payload,
