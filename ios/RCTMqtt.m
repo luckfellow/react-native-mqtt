@@ -99,6 +99,13 @@ RCT_EXPORT_METHOD(disconnectAll) {
     }
 }
 
+RCT_EXPORT_METHOD(isConnected:(nonnull NSString *) clientRef
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+    BOOL retVal = [[[self clients] objectForKey:clientRef] isConnected];
+    resolve(retVal);
+}
+
 RCT_EXPORT_METHOD(subscribe:(nonnull NSString *) clientRef topic:(NSString *)topic qos:(nonnull NSNumber *)qos) {
     [[[self clients] objectForKey:clientRef] subscribe:topic qos:qos];
 }

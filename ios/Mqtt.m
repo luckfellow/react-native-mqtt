@@ -182,6 +182,10 @@
 
 }
 
+- (BOOL) isConnected {
+    return false;
+}
+
 - (void) subscribe:(NSString *)topic qos:(NSNumber *)qos {
     NSMutableDictionary *subscriptions = [self.manager.subscriptions mutableCopy];
     [subscriptions setObject:qos forKey: topic];
